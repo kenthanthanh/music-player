@@ -1,108 +1,169 @@
+
+
 <template>
     <div id="app">
-        <div class="player">
-            <!-- Dashboard -->
-            <div class="dashboard">
-                <!-- Header -->
-                <header>
-                    <h4>Now playing:</h4>
-                    <h2>{{ songs[currentIndex].title }}</h2>
-                </header>
-                <!-- CD -->
-                <div class="cd">
-                    <img
-                        :class="{ spinning: isPlaying }"
-                        class="cd-thumb"
-                        :src="
-                            songs[currentIndex].poster ||
-                            './assets/img/default.jpg'
-                        "
-                    />
-                </div>
-                <!-- Control -->
-                <div class="control">
-                    <div class="btn btn-repeat">
-                        <i class="fas fa-redo"></i>
-                    </div>
-                    <div class="btn btn-prev" @click="prev()">
-                        <i class="fas fa-step-backward"></i>
-                    </div>
-                    <div class="btn btn-toggle-play">
-                        <i
-                            class="fas fa-pause icon-pause"
-                            @click="pause()"
-                            v-if="isPlaying"
-                            >Pause</i
-                        >
-                        <i
-                            v-else
-                            class="fas fa-play icon-play"
-                            @click="play(currentIndex)"
-                        ></i>
-                    </div>
-                    <p>{{ isPlaying }}</p>
-                    <div class="btn btn-next" @click="next()">
-                        <i class="fas fa-step-forward"></i>
-                    </div>
-                    <div class="btn btn-random" @click="random()">
-                        <i class="fas fa-random"></i>
-                    </div>
-                </div>
-                <input
-                    id="progress"
-                    class="progress"
-                    type="range"
-                    value="0"
-                    step="1"
-                    min="0"
-                    max="100"
-                />
-
-                <audio id="audio" src=""></audio>
+      <div class="player">
+        <!-- Dashboard -->
+        <div class="dashboard">
+          <!-- Header -->
+          <header>
+            <h4>Now playing:</h4>
+            <h2>{{ songs[currentIndex].title }}</h2>
+          </header>
+          <!-- CD -->
+          <div class="cd">
+            <img
+              :class="{ spinning: isPlaying }"
+              class="cd-thumb"
+              :src="songs[currentIndex].poster || 'src/assets/img/default.jpg'"
+            />
+          </div>
+          <!-- Control -->
+          <div class="control">
+            <div
+              class="btn btn-repeat"
+              :class="{ active: isRepeat }"
+              @click="
+                () => {
+                  $store.state.isRepeat = !isRepeat;
+                  repeat();
+                }
+              "
+            >
+              <!-- @change="isRepeat ? repeatMode() : repeatState()" -->
+              <i class="fas fa-redo"></i>
             </div>
-            <!-- Playlist -->
-            <ul class="playlist">
-                <li
-                    class="song"
-                    :class="{ active: index === currentIndex }"
-                    v-for="(song, index) in songs"
-                    :key="index"
-                    @click="isPlaying ? pause() : play(index)"
-                >
-                    <img
-                        class="thumb"
-                        :src="song.poster || './assets/img/default.jpg'"
-                    />
-                    <div class="body">
-                        <h3 class="title">{{ song.title }}</h3>
-                        <p class="author">{{ song.singer }}</p>
-                    </div>
-                    <div class="option">
-                        <i class="fas fa-ellipsis-h"></i>
-                    </div>
-                </li>
-            </ul>
+            <div class="btn btn-prev" @click="isRandom ? random() : prev()">
+              <i class="fas fa-step-backward"></i>
+            </div>
+            <div
+              class="btn btn-toggle-play"
+              @click="
+                () => {
+                  if (isPlaying) {
+                    pause();
+                  } else {
+                    getPlayer.play();
+                    $store.state.isPlaying = true;
+                  }
+                }
+              "
+            >
+              <i class="fas fa-pause" v-if="isPlaying"></i>
+              <i v-else class="fas fa-play icon-play"></i>
+            </div>
+            <div class="btn btn-" @click="isRandom ? random() : next()">
+              <i class="fas fa-step-forward"></i>
+            </div>
+            <div
+              class="btn btn-random"
+              :class="{ active: isRandom }"
+              @click="
+                () => {
+                  $store.state.isRandom = !isRandom;
+                  if (!isPlaying) {
+                    random();
+                  }
+                }
+              "
+            >
+              <i class="fas fa-random"></i>
+            </div>
+          </div>
+          <input
+            id="progress"
+            class="progress"
+            type="range"
+            value="0"
+            step="1"
+            min="0"
+            max="100"
+            @change="onTimeUpdate()"
+          />
+          <input
+            id="volume"
+            class="progress"
+            type="range"
+            value="100"
+            step="10"
+            min="0"
+            max="100"
+            @change="setVolume()"
+          />
+  
+  
+          <audio id="audio" src=""></audio>
         </div>
+        <!-- Playlist -->
+        <ul class="playlist">
+          <li
+            class="song"
+            :class="{ active: index === currentIndex }"
+            v-for="(song, index) in songs"
+            :key="index"
+            @click="
+              () => {
+                if (isPlaying && index === currentIndex) {
+                  pause();
+                } else {
+                  play(index);
+                }
+              }
+            "
+          >
+            <img
+              class="thumb"
+              :src="song.poster || 'src/assets/img/default.jpg'"
+            />
+            <div class="body">
+              <h3 class="title">{{ song.title }}</h3>
+              <p class="author">{{ song.singer }}</p>
+            </div>
+            <div class="option">
+              <i class="fas fa-ellipsis-h"></i>
+            </div>
+          </li>
+        </ul>
+      </div>
     </div>
-</template>
-<script>
-import { mapGetters, mapMutations, mapState } from "vuex";
-
-export default {
+  </template>
+  <script>
+  import { mapGetters, mapMutations, mapState } from "vuex";
+  
+  
+  export default {
     methods: {
-        ...mapMutations(["play", "pause", "next", "prev"]),
-
-        created() {
-            this.current = this.songs[this.index];
-            this.player.src = this.current.src;
-        },
+      ...mapMutations([
+        "play",
+        "pause",
+        "next",
+        "prev",
+        "random",
+        "repeat",
+        "onTimeUpdate",
+        "setVolume",
+      ]),
+  
+  
+      created() {
+        this.current = this.songs[this.index];
+        this.player.src = this.current.src;
+      },
     },
-
+  
+  
     computed: {
-        ...mapGetters(["songs", "getPlayer", "currentIndex", "isPlaying"]),
+      ...mapGetters([
+        "songs",
+        "getPlayer",
+        "currentIndex",
+        "isPlaying",
+        "isRandom",
+        "isRepeat",
+      ]),
     },
-};
-</script>
+  };
+  </script>
 <style>
 :root {
     --primary-color: #ec1f55;
