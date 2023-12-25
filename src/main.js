@@ -1,11 +1,18 @@
-import './assets/main.css'
-
 import { createApp } from 'vue'
+import { createStore } from 'vuex'
 import App from './App.vue'
-import router from './router'
 
-const app = createApp(App)
 
-app.use(router)
+import storeConfigs from './stores'
+const app = createApp(App);
 
-app.mount('#app')
+
+// Create a store
+const store = createStore(storeConfigs);
+store.subscribe((mutations, state) => {
+    localStorage.setItem('store', JSON.stringify(state));
+})
+
+
+// app.use(router).use(store).mount('#app')
+app.use(store).mount('#app')
