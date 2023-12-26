@@ -1,13 +1,30 @@
 export default {
+  initialStorage(state) {
+    if (localStorage.getItem("store")) {
+      this.replaceState(
+        Object.assign(state, JSON.parse(localStorage.getItem("store")))
+      );
+    }
+    // state = JSON.parse(localStorage.getItem("store"));
+  },
   play(state, index) {
     const song = state.songs[index];
-    let player = state.player;
+    console.log(state);
+    console.log(state.player);
+
+
+    let audio = state.player;
     if (typeof song.src !== "undefined") {
-      player.src = song.src;
+      audio.src = song.src;
     }
-    player.play();
-    player.addEventListener("ended", () => {
-      console.log(state.isRandom);
+    console.log(state);
+    // this.commit("setVolume");
+    // console.log(state.volume);
+    audio.volume = state.volume;
+    // console.log(audio);
+    audio.play();
+    audio.addEventListener("ended", () => {
+      // console.log(state.isRandom);
       if (state.isRepeat) {
         this.commit("play", state.currentIndex);
       } else if (state.isRandom) {
@@ -66,11 +83,15 @@ export default {
     };
   },
   setVolume(state) {
-    const audio = state.player;
-    const volume = document.querySelector("#volume");
-    volume.onchange = function (e) {
-      const seekVol = e.target.value / 100;
-      audio.volume = seekVol;
+    let audio = state.player;
+    const volumeElement = document.querySelector("#volume");
+    volumeElement.onchange = function (e) {
+      state.volume = e.target.value / 100;
+      // console.log(state.volume);
+      audio.volume = state.volume;
+      // console.log(audio.volume);
     };
   },
 };
+
+
