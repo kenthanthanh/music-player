@@ -1,30 +1,40 @@
 export default {
+  // do nó chuyển từ audio object -> local storage -> empty object
+  // chuyển lại vuex -> empty object -> src= undefined
+  // log ra object với attr là undefined
   initialStorage(state) {
     if (localStorage.getItem("store")) {
-      this.replaceState(
-        Object.assign(state, JSON.parse(localStorage.getItem("store")))
-      );
+      const storedState = JSON.parse(localStorage.getItem("store"));
+      storedState.isPlaying = false;
+      storedState.timeProgress = 0;
+      Object.assign(state, storedState);
+      const playerData = {
+        src: state.songs[state.currentIndex].src,
+        loop: state.isRepeat,
+        volume: state.volume,
+      };
+
+      state.player = new Audio();
+      Object.assign(state.player, playerData);
+    } else {
+      state.player = new Audio();
     }
-    // state = JSON.parse(localStorage.getItem("store"));
   },
   play(state, index) {
-    const song = state.songs[index];
-    console.log(state);
-    console.log(state.player);
-
-
     let audio = state.player;
+    const song = state.songs[index];
+    audio.volume = state.volume;
     if (typeof song.src !== "undefined") {
       audio.src = song.src;
+      audio.load();
     }
-    console.log(state);
-    // this.commit("setVolume");
-    // console.log(state.volume);
-    audio.volume = state.volume;
-    // console.log(audio);
-    audio.play();
+
+    // audio.play();
+    // Fix DOM error by play() interrupt -> create a setTimout to load
+    setTimeout(function () {
+      audio.play();
+    }, 15);
     audio.addEventListener("ended", () => {
-      // console.log(state.isRandom);
       if (state.isRepeat) {
         this.commit("play", state.currentIndex);
       } else if (state.isRandom) {
@@ -71,10 +81,10 @@ export default {
     const progress = document.querySelector("#progress");
     audio.ontimeupdate = () => {
       if (audio.duration) {
-        const progressPercent = Math.floor(
+        state.timeProgress = Math.floor(
           (audio.currentTime / audio.duration) * 100
         );
-        progress.value = progressPercent;
+        progress.value = state.timeProgress;
       }
       progress.onchange = function (e) {
         const seekTime = (audio.duration / 100) * e.target.value;
@@ -82,16 +92,8 @@ export default {
       };
     };
   },
-  setVolume(state) {
-    let audio = state.player;
-    const volumeElement = document.querySelector("#volume");
-    volumeElement.onchange = function (e) {
-      state.volume = e.target.value / 100;
-      // console.log(state.volume);
-      audio.volume = state.volume;
-      // console.log(audio.volume);
-    };
+  updateVolume(state, volume) {
+    state.player.volume = volume;
+    state.volume = volume;
   },
 };
-
-
