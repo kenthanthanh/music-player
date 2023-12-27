@@ -1,0 +1,26 @@
+@use "./base";
+@use "./components";
+
+.player {
+  position: relative;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.dashboard {
+  padding: 16px 16px 14px;
+  background-color: #fff;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  max-width: 480px;
+  border-bottom: 1px solid #ebebeb;
+  border-radius: 5px;
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* PLAYLIST */
+.playlist {
+  margin-top: 408px;
+  padding: 0 12px 12px;
+}

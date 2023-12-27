@@ -5,10 +5,8 @@
   </header>
 </template>
 
-
 <script>
-import { mapGetters } from "vuex";
-
+import { mapGetters, mapState } from "vuex";
 
 export default {
   computed: {
@@ -17,7 +15,6 @@ export default {
 };
 </script>
 
-
 <style>
-@import "./Header.module.scss";
+@import "../styles/main.scss";
 </style>

@@ -25,14 +25,12 @@
   </li>
 </template>
 
-
 <script>
-import { mapMutations, mapGetters } from "vuex";
-
+import { mapActions, mapGetters } from "vuex";
 
 export default {
   methods: {
-    ...mapMutations(["play", "pause"]),
+    ...mapActions(["play", "pause"]),
   },
   computed: {
     ...mapGetters(["songs", "currentIndex", "isPlaying"]),
@@ -40,7 +38,6 @@ export default {
 };
 </script>
 
-
 <style>
-@import "./Song.module.scss";
+@import "../styles/main.scss";
 </style>

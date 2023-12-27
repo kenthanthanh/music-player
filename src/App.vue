@@ -9,23 +9,20 @@
         <CD />
         <!-- :class="{ hidden: shouldHideCD }" -->
 
-
         <Controller />
       </div>
       <!-- Playlist -->
       <ul class="playlist">
-        <Song />
+        <Playlist />
       </ul>
     </div>
   </div>
 </template>
 <script>
-import Header from "./components/Header/Header.vue";
-import CD from "./components/CD/CD.vue";
-import Song from "./components/Song/Song.vue";
-import Controller from "./components/Controller/Controller.vue";
-
-
+import Header from "./components/Header.vue";
+import CD from "./components/CD.vue";
+import Playlist from "./components/Playlist.vue";
+import Controller from "./components/Controller.vue";
 export default {
   beforeCreate() {
     this.$store.commit("initialStorage");
@@ -33,17 +30,12 @@ export default {
   components: {
     Header,
     CD,
-    Song,
+    Playlist,
     Controller,
   },
-  methods: {
-    created() {
-      this.current = this.songs[this.index];
-      this.player.src = this.current.src;
-    },
-  },
+  methods: {},
 };
 </script>
 <style lang="scss">
-@import "./App.module.scss";
+@import "./styles/main.scss";
 </style>

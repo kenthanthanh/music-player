@@ -12,7 +12,6 @@
           }
         "
       >
-        <!-- @change="isRepeat ? repeatMode() : repeatState()" -->
         <i class="fas fa-redo"></i>
       </div>
       <div class="btn btn-prev" @click="isRandom ? random() : prev()">
@@ -55,36 +54,48 @@
     <div class="control-table-progress">
       <input
         id="progress"
-        class="progress"
         type="range"
-        value="0"
+        class="progress"
+        :value="timeProgress"
         step="1"
         min="0"
         max="100"
         @change="onTimeUpdate()"
       />
+
       <input
         id="volume"
         class="progress"
         type="range"
-        step="5"
+        step="1"
         min="0"
         max="100"
         :value="volume !== undefined && 1 >= volume >= 0 ? volume * 100 : 100"
-        @change="setVolume()"
+        @change="
+          (e) => {
+            let volume = e.target.value / 100;
+            updateVolume(volume);
+          }
+        "
       />
     </div>
   </div>
 </template>
 
-
 <script>
-import { mapGetters, mapMutations } from "vuex";
-
+import { mapActions, mapGetters, mapMutations, mapState } from "vuex";
 
 export default {
+  mounted() {
+    const audio = this.player;
+    audio.ontimeupdate = this.onTimeUpdate;
+  },
+  // beforeUnmount() {
+  //   const audio = this.$store.state.player;
+  //   audio.ontimeupdate = null; // Remove event listener when component unmounts
+  // },
   methods: {
-    ...mapMutations([
+    ...mapActions([
       "play",
       "pause",
       "next",
@@ -92,27 +103,21 @@ export default {
       "random",
       "repeat",
       "onTimeUpdate",
-      "setVolume",
     ]),
-    beforeCreate() {
-      this.$store.commit("initialStorage");
-    },
-    created() {
-      this.current = this.songs[this.index];
-      this.player.src = this.current.src;
-    },
+    ...mapMutations(["updateVolume"]),
     // handleScroll() {
     //   const scrollPosition = window.scrollY;
     //   this.shouldHideCD = scrollPosition > 200; // Adjust threshold as needed
     // },
   },
 
-
   computed: {
+    ...mapState(["player"]),
     ...mapGetters([
       "songs",
       "getPlayer",
       "currentIndex",
+      "timeProgress",
       "isPlaying",
       "isRandom",
       "isRepeat",
@@ -122,7 +127,6 @@ export default {
 };
 </script>
 
-
 <style>
-@import "./Controller.module.scss";
+@import "../styles/main.scss";
 </style>
