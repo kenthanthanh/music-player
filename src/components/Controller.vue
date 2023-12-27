@@ -83,7 +83,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters, mapMutations, mapState } from "vuex";
+import { mapActions, mapGetters, mapState } from "vuex";
 
 export default {
   mounted() {
@@ -103,8 +103,8 @@ export default {
       "random",
       "repeat",
       "onTimeUpdate",
+      "updateVolume",
     ]),
-    ...mapMutations(["updateVolume"]),
     // handleScroll() {
     //   const scrollPosition = window.scrollY;
     //   this.shouldHideCD = scrollPosition > 200; // Adjust threshold as needed

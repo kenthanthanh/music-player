@@ -1,5 +1,5 @@
 export default {
-    play({ commit }) {
+    play({ commit }, index) {
       commit("play", index);
     },
     pause({ commit }) {
@@ -20,5 +20,8 @@ export default {
     onTimeUpdate({ commit }) {
       commit("onTimeUpdate");
     },
+    updateVolume({commit}, volume){
+      commit("updateVolume", volume);
+    }
   };
   
